@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,7 @@ export function ProcedureCatalogTab({ searchTerm, setSearchTerm, onAddProcedure 
         </CardContent>
       </Card>
 
-      {/* Reste du contenu existant */}
+      {/* Barre de recherche et filtres */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex gap-2 flex-1">
           <div className="relative flex-1 max-w-md">
@@ -109,6 +110,7 @@ export function ProcedureCatalogTab({ searchTerm, setSearchTerm, onAddProcedure 
         </div>
       </div>
 
+      {/* Grille des procédures */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[
           {
@@ -293,7 +295,7 @@ export function ProcedureCatalogTab({ searchTerm, setSearchTerm, onAddProcedure 
               },
               {
                 type: "Décrets",
-                count: 1,189,
+                count: 1189,
                 icon: <FileText className="w-6 h-6" />,
                 color: "bg-purple-100 text-purple-600",
                 examples: ["Décrets exécutifs", "Décrets présidentiels", "Décrets législatifs"]
