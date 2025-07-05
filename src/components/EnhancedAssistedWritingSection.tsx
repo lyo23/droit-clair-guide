@@ -282,33 +282,11 @@ export function EnhancedAssistedWritingSection() {
   );
 
   const renderConsolidatedTexts = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-2">
-          <BookOpen className="w-5 h-5 text-teal-600" />
-          Textes juridiques consolidés
-        </h2>
-        <p className="text-gray-600 text-sm">
-          Accédez aux versions consolidées et mises à jour des textes juridiques algériens
-        </p>
-      </div>
-      <ConsolidatedTextsSection />
-    </div>
+    <ConsolidatedTextsSection />
   );
 
   const renderConsolidatedProcedures = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 mb-3 flex items-center justify-center gap-2">
-          <FileText className="w-5 h-5 text-teal-600" />
-          Procédures administratives consolidées
-        </h2>
-        <p className="text-gray-600 text-sm">
-          Guides complets et mis à jour des procédures administratives algériennes
-        </p>
-      </div>
-      <ConsolidatedProceduresSection />
-    </div>
+    <ConsolidatedProceduresSection />
   );
 
   return (

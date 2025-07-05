@@ -27,7 +27,11 @@ import {
   Activity,
   Clock,
   ThumbsUp,
-  FileText
+  FileText,
+  Scale,
+  Gavel,
+  Quote,
+  Database
 } from 'lucide-react';
 
 interface ProcedureCatalogTabProps {
@@ -258,6 +262,264 @@ export function ProcedureCatalogTab({ searchTerm, setSearchTerm, onAddProcedure 
           </Card>
         ))}
       </div>
+
+      {/* Types de textes juridiques */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Scale className="w-5 h-5 text-blue-600" />
+            Types de textes juridiques
+          </CardTitle>
+          <CardDescription>
+            Classification des différents types de textes juridiques algériens
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                type: "Codes",
+                count: 12,
+                icon: <BookOpen className="w-6 h-6" />,
+                color: "bg-blue-100 text-blue-600",
+                examples: ["Code civil", "Code pénal", "Code de commerce"]
+              },
+              {
+                type: "Lois",
+                count: 245,
+                icon: <Gavel className="w-6 h-6" />,
+                color: "bg-green-100 text-green-600",
+                examples: ["Loi de finances", "Loi électorale", "Loi sur l'environnement"]
+              },
+              {
+                type: "Décrets",
+                count: 1,189,
+                icon: <FileText className="w-6 h-6" />,
+                color: "bg-purple-100 text-purple-600",
+                examples: ["Décrets exécutifs", "Décrets présidentiels", "Décrets législatifs"]
+              }
+            ].map((typeItem, index) => (
+              <Card key={index} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`p-2 rounded-lg ${typeItem.color}`}>
+                      {typeItem.icon}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg">{typeItem.type}</h3>
+                      <p className="text-sm text-gray-600">{typeItem.count} textes</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {typeItem.examples.map((example, i) => (
+                      <div key={i} className="text-xs text-gray-500">• {example}</div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Textes juridiques en vedette */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-orange-600" />
+            Textes juridiques en vedette
+          </CardTitle>
+          <CardDescription>
+            Textes les plus consultés et récemment mis à jour
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[
+              {
+                title: "Constitution algérienne de 2020",
+                type: "Constitution",
+                lastUpdate: "Novembre 2020",
+                views: 15420,
+                status: "Récent"
+              },
+              {
+                title: "Code de procédure civile et administrative",
+                type: "Code",
+                lastUpdate: "Janvier 2024",
+                views: 12350,
+                status: "Mis à jour"
+              },
+              {
+                title: "Loi de finances 2024",
+                type: "Loi",
+                lastUpdate: "Décembre 2023",
+                views: 8970,
+                status: "Populaire"
+              },
+              {
+                title: "Code du travail consolidé",
+                type: "Code",
+                lastUpdate: "Mars 2024",
+                views: 7650,
+                status: "Consolidé"
+              }
+            ].map((text, index) => (
+              <Card key={index} className="border hover:shadow-sm transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-medium text-sm">{text.title}</h4>
+                    <Badge variant="secondary" className="text-xs">
+                      {text.status}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>{text.type}</span>
+                    <span>{text.views} vues</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Mis à jour: {text.lastUpdate}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Témoignages récents */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-teal-600" />
+            Témoignages récents
+          </CardTitle>
+          <CardDescription>
+            Retours d'expérience des utilisateurs de la plateforme
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[
+              {
+                user: "Maître Ahmed Benali",
+                role: "Avocat au Barreau d'Alger",
+                comment: "Cette plateforme a révolutionné ma façon de rechercher les textes juridiques. La consolidation automatique me fait gagner un temps précieux.",
+                rating: 5,
+                date: "Il y a 2 jours"
+              },
+              {
+                user: "Dr. Fatima Cherif",
+                role: "Professeure de Droit, Université d'Alger",
+                comment: "Un outil indispensable pour l'enseignement du droit. Mes étudiants peuvent facilement accéder aux versions les plus récentes des textes.",
+                rating: 5,
+                date: "Il y a 1 semaine"
+              },
+              {
+                user: "Mohamed Kadri",
+                role: "Juriste d'entreprise",
+                comment: "La fonction de recherche avancée et les procédures détaillées m'aident énormément dans mon travail quotidien.",
+                rating: 4,
+                date: "Il y a 3 jours"
+              }
+            ].map((testimonial, index) => (
+              <Card key={index} className="bg-gray-50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Quote className="w-5 h-5 text-teal-600 mt-1 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-700 mb-3">{testimonial.comment}</p>
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-medium text-sm">{testimonial.user}</div>
+                          <div className="text-xs text-gray-500">{testimonial.role}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex gap-1 mb-1">
+                            {[...Array(testimonial.rating)].map((_, i) => (
+                              <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
+                          <div className="text-xs text-gray-500">{testimonial.date}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Contribuez à la base de données */}
+      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-green-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-emerald-800">
+            <Database className="w-5 h-5" />
+            Contribuez à la base de données
+          </CardTitle>
+          <CardDescription>
+            Aidez-nous à enrichir et améliorer la collection de procédures administratives
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-emerald-800">Comment contribuer ?</h4>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                    <UserPlus className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Ajoutez de nouvelles procédures</div>
+                    <div className="text-xs text-gray-600">Partagez vos connaissances</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Vérifiez l'exactitude</div>
+                    <div className="text-xs text-gray-600">Aidez à maintenir la qualité</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <MessageSquare className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Partagez votre expérience</div>
+                    <div className="text-xs text-gray-600">Témoignages et conseils</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-emerald-800">Statistiques des contributeurs</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3 bg-white rounded-lg">
+                  <div className="text-2xl font-bold text-emerald-600">156</div>
+                  <div className="text-xs text-gray-600">Contributeurs actifs</div>
+                </div>
+                <div className="text-center p-3 bg-white rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600">89</div>
+                  <div className="text-xs text-gray-600">Procédures ajoutées ce mois</div>
+                </div>
+              </div>
+              <Button 
+                className="w-full bg-emerald-600 hover:bg-emerald-700" 
+                onClick={onAddProcedure}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Commencer à contribuer
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
