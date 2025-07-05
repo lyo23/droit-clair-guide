@@ -88,10 +88,10 @@ class PerformanceMonitor {
       ttfb: navigation ? navigation.responseStart - navigation.requestStart : 0,
       
       // Dom Content Loaded
-      dcl: navigation ? navigation.domContentLoadedEventEnd - navigation.navigationStart : 0,
+      dcl: navigation ? navigation.domContentLoadedEventEnd - navigation.fetchStart : 0,
       
       // Load Complete
-      loadComplete: navigation ? navigation.loadEventEnd - navigation.navigationStart : 0,
+      loadComplete: navigation ? navigation.loadEventEnd - navigation.fetchStart : 0,
       
       // Memory usage (si disponible)
       memoryUsage: this.getMemoryUsage(),

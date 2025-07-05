@@ -122,7 +122,7 @@ export function useCachedData<T>(
 
     try {
       // Vérifier le cache d'abord
-      const cached = enhancedCache.get<T>(key);
+      const cached = enhancedCache.get(key) as T | null;
       if (cached) {
         setData(cached);
         setIsLoading(false);
