@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, Loader2, Eye, Download, Share } from "lucide-react";
 import { SearchService, SearchResult } from './SearchService';
-import { VoiceSearchInput } from '@/components/common/VoiceSearchInput';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 
 interface SearchInterfaceProps {
   placeholder?: string;
@@ -61,13 +61,14 @@ export function SearchInterface({
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-2">
-            <VoiceSearchInput
+            <EnhancedInput
               value={searchQuery}
-              onChange={setSearchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={placeholder}
               context="search"
               className="flex-1"
               onKeyPress={handleKeyPress}
+              enableVoice={true}
             />
             <Button 
               onClick={handleSearch}

@@ -11,7 +11,7 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { SearchService, SearchResult } from '@/components/search/SearchService';
-import { VoiceSearchInput } from '@/components/common/VoiceSearchInput';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 
 export function AdvancedSearchSection() {
   const [keywords, setKeywords] = useState('');
@@ -101,11 +101,12 @@ export function AdvancedSearchSection() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="keywords">Mots-clés</Label>
-              <VoiceSearchInput
+              <EnhancedInput
                 value={keywords}
-                onChange={setKeywords}
+                onChange={(e) => setKeywords(e.target.value)}
                 placeholder="Rechercher dans le contenu..."
                 context="search"
+                enableVoice={true}
               />
             </div>
 
@@ -116,11 +117,14 @@ export function AdvancedSearchSection() {
                   <SelectValue placeholder="Tous les types" />
                 </SelectTrigger>
                 <SelectContent>
-                  {documentTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="Tous les types">Tous les types</SelectItem>
+                  <SelectItem value="Loi">Loi</SelectItem>
+                  <SelectItem value="Décret">Décret</SelectItem>
+                  <SelectItem value="Arrêté">Arrêté</SelectItem>
+                  <SelectItem value="Circulaire">Circulaire</SelectItem>
+                  <SelectItem value="Ordonnance">Ordonnance</SelectItem>
+                  <SelectItem value="Code">Code</SelectItem>
+                  <SelectItem value="Jurisprudence">Jurisprudence</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -193,11 +197,14 @@ export function AdvancedSearchSection() {
                 <SelectValue placeholder="Ministère ou institution..." />
               </SelectTrigger>
               <SelectContent>
-                {institutions.map((inst) => (
-                  <SelectItem key={inst} value={inst}>
-                    {inst}
-                  </SelectItem>
-                ))}
+                <SelectItem value="Ministère ou institution...">Ministère ou institution...</SelectItem>
+                <SelectItem value="Présidence de la République">Présidence de la République</SelectItem>
+                <SelectItem value="Premier Ministère">Premier Ministère</SelectItem>
+                <SelectItem value="Ministère de la Justice">Ministère de la Justice</SelectItem>
+                <SelectItem value="Ministère de l'Intérieur et des Collectivités Locales">Ministère de l'Intérieur et des Collectivités Locales</SelectItem>
+                <SelectItem value="Ministère des Finances">Ministère des Finances</SelectItem>
+                <SelectItem value="Ministère de l'Énergie">Ministère de l'Énergie</SelectItem>
+                <SelectItem value="Ministère de l'Agriculture et du Développement Rural">Ministère de l'Agriculture et du Développement Rural</SelectItem>
               </SelectContent>
             </Select>
           </div>

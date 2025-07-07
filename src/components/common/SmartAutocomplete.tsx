@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VoiceSearchInput } from './VoiceSearchInput';
+import { EnhancedInput } from './EnhancedInput';
 
 interface AutocompleteOption {
   id: string;
@@ -17,6 +17,7 @@ interface SmartAutocompleteProps {
   context?: 'search' | 'legal' | 'procedure' | 'general';
   className?: string;
   onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  suggestions?: AutocompleteOption[];
 }
 
 export function SmartAutocomplete({ 
@@ -25,17 +26,19 @@ export function SmartAutocomplete({
   placeholder = "Tapez pour commencer...",
   context = 'general',
   className,
-  onKeyPress
+  onKeyPress,
+  suggestions = []
 }: SmartAutocompleteProps) {
   return (
-    <VoiceSearchInput
+    <EnhancedInput
       value={value}
-      onChange={onChange}
+      onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
       context={context}
       className={className}
       onKeyPress={onKeyPress}
-      showVoiceButton={true}
+      enableVoice={true}
+      suggestions={suggestions}
     />
   );
 }

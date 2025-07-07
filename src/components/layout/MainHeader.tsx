@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Bell, User, Search, MessageSquare, Menu, Star, Bot } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -7,7 +6,7 @@ import { NotificationDropdown } from "@/components/NotificationDropdown";
 import { AccountDropdown } from "@/components/AccountDropdown";
 import { MessagesDropdown } from "@/components/MessagesDropdown";
 import { MainNavigation } from "@/components/MainNavigation";
-import { VoiceSearchInput } from "@/components/common/VoiceSearchInput";
+import { EnhancedInput } from "@/components/common/EnhancedInput";
 import { useCallback, useMemo, useState } from "react";
 
 interface MainHeaderProps {
@@ -41,7 +40,6 @@ export function MainHeader({ language, activeSection, onLanguageChange, onSectio
     return translations[language as keyof typeof translations]?.[key as keyof typeof translations['fr']] || key;
   }, [language]);
 
-  // Gestionnaires d'événements mémorisés
   const handleFavoritesClick = useCallback(() => {
     onSectionChange("favorites");
   }, [onSectionChange]);
@@ -52,12 +50,10 @@ export function MainHeader({ language, activeSection, onLanguageChange, onSectio
 
   const handleQuickSearchKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && quickSearchValue.trim()) {
-      // Rediriger vers la section de recherche avec le terme
       onSectionChange("search");
     }
   }, [quickSearchValue, onSectionChange]);
 
-  // Textes mémorisés
   const headerTexts = useMemo(() => ({
     title: getHeaderText("title"),
     subtitle: getHeaderText("subtitle"),
@@ -85,13 +81,14 @@ export function MainHeader({ language, activeSection, onLanguageChange, onSectio
           </div>
 
           <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <VoiceSearchInput
+            <EnhancedInput
               value={quickSearchValue}
-              onChange={setQuickSearchValue}
+              onChange={(e) => setQuickSearchValue(e.target.value)}
               placeholder={headerTexts.searchPlaceholder}
               context="general"
               onKeyPress={handleQuickSearchKeyPress}
               className="bg-gray-50 border-gray-200 text-sm"
+              enableVoice={true}
             />
           </div>
           
@@ -135,13 +132,14 @@ export function MainHeader({ language, activeSection, onLanguageChange, onSectio
               <SheetContent side="right" className="w-80 p-0" aria-label="Menu de navigation mobile">
                 <div className="p-4">
                   <div className="relative mb-4">
-                    <VoiceSearchInput
+                    <EnhancedInput
                       value={quickSearchValue}
-                      onChange={setQuickSearchValue}
+                      onChange={(e) => setQuickSearchValue(e.target.value)}
                       placeholder={headerTexts.searchPlaceholder}
                       context="general"
                       onKeyPress={handleQuickSearchKeyPress}
                       className="bg-gray-50 border-gray-200"
+                      enableVoice={true}
                     />
                   </div>
                   <MainNavigation 
