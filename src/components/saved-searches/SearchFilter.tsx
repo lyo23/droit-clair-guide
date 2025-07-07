@@ -23,7 +23,7 @@ export function SearchFilter({ searchTerm, onSearchChange }: SearchFilterProps) 
               enableVoice={true}
             />
           </div>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => (window as any).actionHandlers?.handleFilter?.()}>
             <Filter className="w-4 h-4 mr-2" />
             Filtrer
           </Button>
