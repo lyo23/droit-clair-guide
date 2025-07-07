@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mic, MicOff, Command, Clock, Star, Search } from 'lucide-react';
+import { Mic, MicOff, Clock, Star, Command, Search } from 'lucide-react';
 import { useVoiceRecognition } from '@/hooks/useVoiceRecognition';
 import { cn } from '@/lib/utils';
 
@@ -19,21 +19,27 @@ interface EnhancedTextareaProps extends React.ComponentProps<"textarea"> {
   enableVoice?: boolean;
   context?: 'search' | 'legal' | 'procedure' | 'general';
   suggestions?: SuggestionItem[];
+  showVoiceButton?: boolean;
 }
 
 export function EnhancedTextarea({ 
-  enableVoice = true,
+  enableVoice = true, 
   context = 'general',
   suggestions = [],
+  showVoiceButton = true,
   className,
   value,
   onChange,
+  onKeyPress,
   placeholder,
   ...props 
 }: EnhancedTextareaProps) {
-  const [showSuggestions, setShowSuggestions] = React.useState(false);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
-
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<SuggestionItem[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  
   const { 
     isListening, 
     transcript, 
@@ -48,31 +54,108 @@ export function EnhancedTextarea({
     language: 'fr-FR'
   });
 
-  // Suggestions par contexte
+  // Suggestions prédéfinies par contexte
   const defaultSuggestions: Record<string, SuggestionItem[]> = {
     legal: [
-      { id: '1', text: 'Article du code civil', type: 'legal_term', category: 'Civil' },
-      { id: '2', text: 'Dispositions réglementaires', type: 'legal_term', category: 'Règlement' },
-      { id: '3', text: 'Jurisprudence constante', type: 'legal_term', category: 'Jurisprudence' }
+      { id: '1', text: 'Code civil algérien', type: 'legal_term', category: 'Code' },
+      { id: '2', text: 'Loi de finances 2024', type: 'legal_term', category: 'Loi' },
+      { id: '3', text: 'Décret exécutif', type: 'legal_term', category: 'Décret' },
+      { id: '4', text: 'Constitution algérienne', type: 'legal_term', category: 'Constitution' },
+      { id: '5', text: 'Ordonnance présidentielle', type: 'legal_term', category: 'Ordonnance' }
     ],
     procedure: [
-      { id: '1', text: 'Étapes de la procédure', type: 'template', category: 'Procédure' },
-      { id: '2', text: 'Documents requis', type: 'template', category: 'Documents' },
-      { id: '3', text: 'Délais de traitement', type: 'template', category: 'Délais' }
+      { id: '1', text: 'Demande de passeport biométrique', type: 'template', category: 'Identité' },
+      { id: '2', text: 'Inscription universitaire', type: 'template', category: 'Éducation' },
+      { id: '3', text: 'Création d\'entreprise EURL', type: 'template', category: 'Commerce' },
+      { id: '4', text: 'Permis de construire', type: 'template', category: 'Urbanisme' }
+    ],
+    search: [
+      { id: '1', text: 'textes juridiques récents', type: 'suggestion' },
+      { id: '2', text: 'procédures administratives', type: 'suggestion' },
+      { id: '3', text: 'jurisprudence 2024', type: 'suggestion' }
     ],
     general: [
-      { id: '1', text: 'Description détaillée', type: 'suggestion' },
-      { id: '2', text: 'Contexte applicable', type: 'suggestion' }
+      { id: '1', text: 'rechercher dans', type: 'suggestion' },
+      { id: '2', text: 'documentation officielle', type: 'suggestion' }
     ]
   };
 
-  React.useEffect(() => {
+  // Mettre à jour la valeur depuis la reconnaissance vocale
+  useEffect(() => {
     if (transcript && transcript.trim() !== '') {
-      onChange?.({ target: { value: (value || '') + ' ' + transcript } } as any);
+      const currentValue = (value as string) || '';
+      const newValue = currentValue + (currentValue ? ' ' : '') + transcript;
+      onChange?.({ target: { value: newValue } } as any);
     }
   }, [transcript, onChange, value]);
 
-  const allSuggestions = [...suggestions, ...(defaultSuggestions[context] || [])];
+  // Filtrer les suggestions en fonction de la saisie
+  useEffect(() => {
+    const allSuggestions = [...(suggestions || []), ...(defaultSuggestions[context] || [])];
+    const currentValue = (value as string) || '';
+    
+    if (currentValue.length > 0) {
+      const filtered = allSuggestions
+        .filter(item => 
+          item.text.toLowerCase().includes(currentValue.toLowerCase())
+        )
+        .slice(0, 6);
+      
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+      setFilteredSuggestions([]);
+    }
+    setSelectedIndex(-1);
+  }, [value, context, suggestions]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!showSuggestions) {
+      if (onKeyPress) {
+        onKeyPress(e);
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0) {
+          onChange?.({ target: { value: filteredSuggestions[selectedIndex].text } } as any);
+          setShowSuggestions(false);
+        } else if (onKeyPress) {
+          onKeyPress(e);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        break;
+      default:
+        if (onKeyPress) {
+          onKeyPress(e);
+        }
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: SuggestionItem) => {
+    onChange?.({ target: { value: suggestion.text } } as any);
+    setShowSuggestions(false);
+    textareaRef.current?.focus();
+  };
 
   const handleVoiceToggle = () => {
     if (isListening) {
@@ -81,13 +164,6 @@ export function EnhancedTextarea({
       resetTranscript();
       startListening();
     }
-  };
-
-  const handleSuggestionClick = (suggestion: SuggestionItem) => {
-    const newValue = (value || '') + ' ' + suggestion.text;
-    onChange?.({ target: { value: newValue } } as any);
-    setShowSuggestions(false);
-    textareaRef.current?.focus();
   };
 
   const getSuggestionIcon = (type: SuggestionItem['type']) => {
@@ -99,6 +175,21 @@ export function EnhancedTextarea({
     }
   };
 
+  // Si enableVoice est false, utiliser Textarea standard
+  if (!enableVoice) {
+    return (
+      <Textarea
+        {...props}
+        ref={textareaRef}
+        value={value}
+        onChange={onChange}
+        onKeyDown={onKeyPress}
+        placeholder={placeholder}
+        className={className}
+      />
+    );
+  }
+
   return (
     <div className="relative">
       <div className="relative">
@@ -107,16 +198,17 @@ export function EnhancedTextarea({
           ref={textareaRef}
           value={value}
           onChange={onChange}
+          onKeyDown={handleKeyDown}
+          onFocus={() => (value as string)?.length > 0 && setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           placeholder={placeholder}
           className={cn(
             isListening ? "border-red-300 bg-red-50" : "",
             className
           )}
-          onFocus={() => allSuggestions.length > 0 && setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         />
         
-        {enableVoice && isSupported && (
+        {showVoiceButton && isSupported && (
           <Button
             type="button"
             variant="ghost"
@@ -155,17 +247,25 @@ export function EnhancedTextarea({
       )}
       
       {/* Suggestions */}
-      {showSuggestions && !isListening && allSuggestions.length > 0 && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-1 max-h-48 overflow-y-auto bg-white border shadow-lg">
+      {showSuggestions && !isListening && (
+        <Card 
+          ref={suggestionsRef}
+          className="absolute top-full left-0 right-0 z-50 mt-1 max-h-64 overflow-y-auto bg-white border shadow-lg"
+        >
           <div className="p-2">
-            {allSuggestions.slice(0, 6).map((suggestion) => (
+            {filteredSuggestions.map((suggestion, index) => (
               <div
                 key={suggestion.id}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="flex items-center gap-2 p-2 rounded cursor-pointer transition-colors hover:bg-gray-50"
+                className={cn(
+                  "flex items-center gap-2 p-2 rounded cursor-pointer transition-colors",
+                  index === selectedIndex 
+                    ? "bg-emerald-50 text-emerald-700" 
+                    : "hover:bg-gray-50"
+                )}
               >
                 {getSuggestionIcon(suggestion.type)}
-                <span className="flex-1 text-sm">{suggestion.text}</span>
+                <span className="flex-1">{suggestion.text}</span>
                 {suggestion.category && (
                   <Badge variant="outline" className="text-xs">
                     {suggestion.category}

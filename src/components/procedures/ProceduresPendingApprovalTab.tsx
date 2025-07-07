@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 import { 
   Search, 
   Clock, 
@@ -160,12 +159,12 @@ export function ProceduresPendingApprovalTab() {
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex gap-2 flex-1">
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
+            <EnhancedInput
               placeholder="Rechercher dans les procédures en attente..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              context="search"
+              enableVoice={true}
             />
           </div>
           <Button variant="outline" size="sm">
