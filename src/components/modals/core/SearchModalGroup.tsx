@@ -20,9 +20,8 @@ export function SearchModalGroup({ modals, closeModal }: SearchModalGroupProps) 
       />
 
       <FilterModal
-        isOpen={modals.filter.isOpen}
-        onClose={() => closeModal('filter')}
-        onApplyFilters={(filters) => {
+        trigger={null}
+        onFiltersApply={(filters) => {
           console.log('Filters applied:', filters);
           closeModal('filter');
         }}
@@ -39,9 +38,7 @@ export function SearchModalGroup({ modals, closeModal }: SearchModalGroupProps) 
       />
 
       <GeolocationSearchModal
-        isOpen={modals.geolocationSearch.isOpen}
-        onClose={() => closeModal('geolocationSearch')}
-        location={modals.geolocationSearch.location}
+        trigger={null}
         onLocationSelect={(location) => {
           console.log('Location selected:', location);
           closeModal('geolocationSearch');

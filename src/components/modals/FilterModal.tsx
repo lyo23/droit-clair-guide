@@ -14,9 +14,10 @@ interface FilterModalProps {
   trigger?: React.ReactNode;
   onFiltersApply?: (filters: any) => void;
   initialFilters?: any;
+  filterType?: 'legal' | 'procedure' | 'general';
 }
 
-export function FilterModal({ trigger, onFiltersApply, initialFilters = {} }: FilterModalProps) {
+export function FilterModal({ trigger, onFiltersApply, initialFilters = {}, filterType = 'general' }: FilterModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState({
     searchTerm: '',
@@ -194,7 +195,7 @@ export function FilterModal({ trigger, onFiltersApply, initialFilters = {} }: Fi
                   if (!value || (Array.isArray(value) && value.length === 0)) return null;
                   return (
                     <Badge key={key} variant="secondary" className="flex items-center gap-1">
-                      {key}: {Array.isArray(value) ? value.join(', ') : value}
+                      {key}: {Array.isArray(value) ? value.join(', ') : String(value)}
                       <X
                         className="w-3 h-3 cursor-pointer"
                         onClick={() => handleFilterChange(key, Array.isArray(value) ? [] : '')}

@@ -375,10 +375,9 @@ export function ActionHandler({ children }: ActionHandlerProps) {
       />
 
       <FilterModal
-        isOpen={modals.filter.isOpen}
-        onClose={() => closeModal('filter')}
+        trigger={null}
         filterType={modals.filter.type}
-        onApplyFilters={(filters) => {
+        onFiltersApply={(filters) => {
           console.log('Filters applied:', filters);
           toast({
             title: "Filtres appliqués",
