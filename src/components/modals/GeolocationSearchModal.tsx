@@ -1,60 +1,75 @@
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Search, Navigation } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Search, Navigation, Target } from 'lucide-react';
 
 interface GeolocationSearchModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  location?: any;
-  onLocationSelect: (location: any) => void;
+  trigger?: React.ReactNode;
+  onLocationSelect?: (location: any) => void;
 }
 
-export function GeolocationSearchModal({ isOpen, onClose, location, onLocationSelect }: GeolocationSearchModalProps) {
+export function GeolocationSearchModal({ trigger, onLocationSelect }: GeolocationSearchModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentLocation, setCurrentLocation] = useState<any>(null);
-  const [isLocating, setIsLocating] = useState(false);
+  const [selectedWilaya, setSelectedWilaya] = useState('');
+  const [selectedCommune, setSelectedCommune] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
-  const getCurrentLocation = () => {
-    setIsLocating(true);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const coords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          };
-          setCurrentLocation(coords);
-          setIsLocating(false);
-        },
-        (error) => {
-          console.error('Geolocation error:', error);
-          setIsLocating(false);
-        }
-      );
-    }
-  };
+  const wilayas = [
+    'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa', 'Biskra', 'Béchar',
+    'Blida', 'Bouira', 'Tamanrasset', 'Tébessa', 'Tlemcen', 'Tiaret', 'Tizi Ouzou', 'Alger',
+    'Djelfa', 'Jijel', 'Sétif', 'Saïda', 'Skikda', 'Sidi Bel Abbès', 'Annaba', 'Guelma',
+    'Constantine', 'Médéa', 'Mostaganem', 'MSila', 'Mascara', 'Ouargla', 'Oran', 'El Bayadh',
+    'Illizi', 'Bordj Bou Arréridj', 'Boumerdès', 'El Tarf', 'Tindouf', 'Tissemsilt', 'El Oued',
+    'Khenchela', 'Souk Ahras', 'Tipaza', 'Mila', 'Aïn Defla', 'Naâma', 'Aïn Témouchent',
+    'Ghardaïa', 'Relizane'
+  ];
 
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      onLocationSelect({ query: searchQuery, type: 'search' });
-    }
+    // Simulation de recherche géolocalisée
+    const mockResults = [
+      {
+        id: 1,
+        name: searchQuery || 'Tribunal de première instance',
+        address: selectedWilaya ? `${selectedWilaya}, ${selectedCommune || 'Centre-ville'}` : 'Alger, Centre-ville',
+        type: 'Institution judiciaire',
+        distance: '2.5 km',
+        coordinates: { lat: 36.7538, lng: 3.0588 }
+      },
+      {
+        id: 2,
+        name: searchQuery || 'Mairie',
+        address: selectedWilaya ? `${selectedWilaya}, ${selectedCommune || 'Centre-ville'}` : 'Alger, Centre-ville',
+        type: 'Administration',
+        distance: '1.8 km',
+        coordinates: { lat: 36.7538, lng: 3.0588 }
+      }
+    ];
+    setSearchResults(mockResults);
   };
 
-  const handleCurrentLocation = () => {
-    if (currentLocation) {
-      onLocationSelect({ ...currentLocation, type: 'current' });
-    }
+  const handleLocationSelect = (location: any) => {
+    onLocationSelect?.(location);
+    setIsOpen(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="outline" className="gap-2">
+            <MapPin className="w-4 h-4" />
+            Recherche géolocalisée
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="w-5 h-5" />
@@ -62,62 +77,90 @@ export function GeolocationSearchModal({ isOpen, onClose, location, onLocationSe
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Recherche par adresse</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <Label htmlFor="location-search">Adresse ou lieu</Label>
-                <Input
-                  id="location-search"
-                  placeholder="Ville, wilaya, adresse..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                />
-              </div>
-              <Button onClick={handleSearch} className="w-full" disabled={!searchQuery.trim()}>
-                <Search className="w-4 h-4 mr-2" />
-                Rechercher
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="space-y-6">
+          {/* Recherche textuelle */}
+          <div>
+            <Label htmlFor="geo-search">Rechercher un lieu ou une institution</Label>
+            <EnhancedInput
+              id="geo-search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Ex: tribunal, mairie, préfecture..."
+              context="search"
+              enableVoice={true}
+            />
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Position actuelle</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                onClick={getCurrentLocation} 
-                variant="outline" 
-                className="w-full"
-                disabled={isLocating}
-              >
-                <Navigation className="w-4 h-4 mr-2" />
-                {isLocating ? 'Localisation...' : 'Utiliser ma position'}
-              </Button>
-              
-              {currentLocation && (
-                <div className="text-sm text-gray-600">
-                  <p>Position détectée :</p>
-                  <p>Lat: {currentLocation.latitude.toFixed(6)}</p>
-                  <p>Lng: {currentLocation.longitude.toFixed(6)}</p>
-                  <Button onClick={handleCurrentLocation} size="sm" className="mt-2 w-full">
-                    Utiliser cette position
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+          {/* Sélection de wilaya */}
+          <div>
+            <Label>Wilaya</Label>
+            <Select value={selectedWilaya} onValueChange={setSelectedWilaya}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner une wilaya" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Toutes les wilayas</SelectItem>
+                {wilayas.map(wilaya => (
+                  <SelectItem key={wilaya} value={wilaya}>
+                    {wilaya}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={onClose}>
-            Annuler
-          </Button>
+          {/* Commune (si wilaya sélectionnée) */}
+          {selectedWilaya && (
+            <div>
+              <Label htmlFor="commune">Commune</Label>
+              <EnhancedInput
+                id="commune"
+                value={selectedCommune}
+                onChange={(e) => setSelectedCommune(e.target.value)}
+                placeholder="Nom de la commune..."
+                context="general"
+                enableVoice={true}
+              />
+            </div>
+          )}
+
+          {/* Boutons d'action */}
+          <div className="flex gap-3">
+            <Button onClick={handleSearch} className="flex-1">
+              <Search className="w-4 h-4 mr-2" />
+              Rechercher
+            </Button>
+            <Button variant="outline">
+              <Navigation className="w-4 h-4 mr-2" />
+              Ma position
+            </Button>
+          </div>
+
+          {/* Résultats */}
+          {searchResults.length > 0 && (
+            <div className="space-y-3">
+              <Label>Résultats trouvés</Label>
+              {searchResults.map((result) => (
+                <Card key={result.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4" onClick={() => handleLocationSelect(result)}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-semibold flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          {result.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">{result.address}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline">{result.type}</Badge>
+                          <Badge variant="secondary">{result.distance}</Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

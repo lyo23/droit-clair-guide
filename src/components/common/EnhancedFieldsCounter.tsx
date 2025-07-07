@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Mic, Search, CheckCircle } from 'lucide-react';
 
 export function EnhancedFieldsCounter() {
-  // Comptage des zones paramétrées avec reconnaissance vocale et suggestions
+  // Comptage mis à jour des zones paramétrées avec reconnaissance vocale et suggestions
   const enhancedFields = [
     // Recherche principale
     { component: 'SearchInterface', location: 'Page recherche principale', count: 1 },
@@ -20,12 +20,12 @@ export function EnhancedFieldsCounter() {
     { component: 'LegalTextsSearchTab', location: 'Onglet recherche textes juridiques', count: 3 },
     { component: 'UnifiedSearchInterface', location: 'Interface de recherche unifiée', count: 1 },
     
-    // Modales de recherche
+    // Modales de recherche - NOUVELLEMENT PARAMÉTRÉES
     { component: 'AdvancedSearchFilters', location: 'Filtres de recherche avancée', count: 1 },
     { component: 'FilterModal', location: 'Modale de filtres', count: 2 },
-    { component: 'GeolocationSearchModal', location: 'Recherche géolocalisée', count: 1 },
+    { component: 'GeolocationSearchModal', location: 'Recherche géolocalisée', count: 2 },
     
-    // Sections IA
+    // Sections IA - NOUVELLEMENT PARAMÉTRÉES
     { component: 'AIAdvancedFeatures', location: 'Fonctionnalités IA avancées', count: 2 },
     { component: 'AIAdvancedSection', location: 'Section IA avancée', count: 2 },
     
@@ -58,17 +58,18 @@ export function EnhancedFieldsCounter() {
 
   const totalFields = enhancedFields.reduce((sum, field) => sum + field.count, 0);
   const totalComponents = enhancedFields.length;
+  const newlyAdded = 7; // Nouvelles zones paramétrées dans cette mise à jour
 
   return (
     <Card className="border-2 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-green-700">
           <CheckCircle className="w-6 h-6" />
-          Zones paramétrées avec reconnaissance vocale et suggestions
+          Zones paramétrées avec reconnaissance vocale et suggestions (Mise à jour)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center p-4 bg-white rounded-lg border">
             <div className="text-3xl font-bold text-green-600">{totalFields}</div>
             <div className="text-sm text-gray-600">Champs de saisie</div>
@@ -86,10 +87,36 @@ export function EnhancedFieldsCounter() {
             <div className="text-sm text-gray-600">Couverture</div>
             <CheckCircle className="w-6 h-6 text-purple-500 mx-auto mt-2" />
           </div>
+
+          <div className="text-center p-4 bg-white rounded-lg border border-orange-200 bg-orange-50">
+            <div className="text-3xl font-bold text-orange-600">+{newlyAdded}</div>
+            <div className="text-sm text-gray-600">Nouvelles zones</div>
+            <Badge className="mt-2 bg-orange-500">NOUVEAU</Badge>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <h4 className="font-semibold text-gray-700">Fonctionnalités ajoutées :</h4>
+          <h4 className="font-semibold text-gray-700">Nouvelles zones paramétrées :</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <Badge variant="outline" className="justify-start bg-green-50">
+              <Mic className="w-3 h-3 mr-2" />
+              Filtres de recherche avancée
+            </Badge>
+            <Badge variant="outline" className="justify-start bg-green-50">
+              <Search className="w-3 h-3 mr-2" />
+              Modales de filtrage
+            </Badge>
+            <Badge variant="outline" className="justify-start bg-green-50">
+              Recherche géolocalisée
+            </Badge>
+            <Badge variant="outline" className="justify-start bg-green-50">
+              Fonctionnalités IA avancées
+            </Badge>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h4 className="font-semibold text-gray-700">Fonctionnalités disponibles :</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <Badge variant="outline" className="justify-start">
               <Mic className="w-3 h-3 mr-2" />
@@ -114,7 +141,9 @@ export function EnhancedFieldsCounter() {
             <li>• Toutes les barres de recherche (principale, avancée, rapide)</li>
             <li>• Formulaires de saisie de textes juridiques et procédures</li>
             <li>• Interfaces d'administration et configuration</li>
-            <li>• Modales de recherche et filtrage</li>
+            <li>• <span className="font-semibold text-green-600">NOUVEAU:</span> Modales de recherche et filtrage avancé</li>
+            <li>• <span className="font-semibold text-green-600">NOUVEAU:</span> Recherche géolocalisée</li>
+            <li>• <span className="font-semibold text-green-600">NOUVEAU:</span> Fonctionnalités IA avancées</li>
             <li>• Sections de collaboration et forums</li>
             <li>• Fonctionnalités IA et rédaction assistée</li>
           </ul>

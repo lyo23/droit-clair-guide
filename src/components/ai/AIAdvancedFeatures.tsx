@@ -1,96 +1,259 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
+import { EnhancedTextarea } from '@/components/common/EnhancedTextarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Brain, FileText, Sparkles, MessageSquare, Zap } from 'lucide-react';
-import { IntelligentDocumentAnalyzer } from './IntelligentDocumentAnalyzer';
-import { AIRecommendationEngine } from './AIRecommendationEngine';
-import { ContextualSearchAssistant } from './ContextualSearchAssistant';
-import { SectionHeader } from '@/components/common/SectionHeader';
+import { Bot, Wand2, FileText, Search, Lightbulb, Zap } from 'lucide-react';
 
 export function AIAdvancedFeatures() {
-  const [activeFeature, setActiveFeature] = useState('analyzer');
+  const [analysisInput, setAnalysisInput] = useState('');
+  const [summaryInput, setSummaryInput] = useState('');
+  const [analysisType, setAnalysisType] = useState('');
+  const [summaryType, setSummaryType] = useState('');
+  const [results, setResults] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  const features = [
-    {
-      id: 'analyzer',
-      title: 'Analyseur Intelligent',
-      description: 'Analyse automatique de documents avec IA',
-      icon: FileText,
-      badge: 'Nouveau',
-      color: 'text-purple-600'
-    },
-    {
-      id: 'recommendations',
-      title: 'Recommandations IA',
-      description: 'Suggestions personnalisées basées sur vos activités',
-      icon: Sparkles,
-      badge: 'Populaire',
-      color: 'text-blue-600'
-    },
-    {
-      id: 'assistant',
-      title: 'Assistant Contextuel',
-      description: 'Recherche intelligente avec compréhension du contexte',
-      icon: MessageSquare,
-      badge: 'IA Avancée',
-      color: 'text-green-600'
-    }
+  const analysisTypes = [
+    { value: 'legal', label: 'Analyse juridique' },
+    { value: 'compliance', label: 'Analyse de conformité' },
+    { value: 'risk', label: 'Analyse de risques' },
+    { value: 'comparison', label: 'Analyse comparative' }
   ];
+
+  const summaryTypes = [
+    { value: 'executive', label: 'Résumé exécutif' },
+    { value: 'technical', label: 'Résumé technique' },
+    { value: 'legal', label: 'Résumé juridique' },
+    { value: 'structured', label: 'Résumé structuré' }
+  ];
+
+  const handleAnalysis = async () => {
+    if (!analysisInput.trim() || !analysisType) return;
+    
+    setLoading(true);
+    // Simulation d'analyse IA
+    setTimeout(() => {
+      setResults({
+        type: 'analysis',
+        content: `Analyse ${analysisTypes.find(t => t.value === analysisType)?.label} du contenu fourni...`,
+        recommendations: [
+          'Recommandation 1 basée sur l\'analyse',
+          'Recommandation 2 pour améliorer la conformité',
+          'Recommandation 3 pour réduire les risques'
+        ]
+      });
+      setLoading(false);
+    }, 2000);
+  };
+
+  const handleSummary = async () => {
+    if (!summaryInput.trim() || !summaryType) return;
+    
+    setLoading(true);
+    // Simulation de résumé IA
+    setTimeout(() => {
+      setResults({
+        type: 'summary',
+        content: `${summaryTypes.find(t => t.value === summaryType)?.label} généré automatiquement...`,
+        keyPoints: [
+          'Point clé 1 extrait du document',
+          'Point clé 2 identifié par l\'IA',
+          'Point clé 3 résumé automatiquement'
+        ]
+      });
+      setLoading(false);
+    }, 2000);
+  };
 
   return (
     <div className="space-y-6">
-      <SectionHeader
-        title="Fonctionnalités IA Avancées"
-        description="Exploitez la puissance de l'intelligence artificielle pour optimiser votre travail juridique"
-        icon={Brain}
-        iconColor="text-purple-600"
-      />
-
-      <Card className="border-2 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="w-6 h-6 text-purple-600" />
-            Centre de Contrôle IA
-          </CardTitle>
-          <p className="text-gray-600">
-            Choisissez l'outil IA qui correspond à vos besoins actuels
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {features.map((feature) => (
-              <Card
-                key={feature.id}
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  activeFeature === feature.id 
-                    ? 'ring-2 ring-purple-500 shadow-md' 
-                    : 'hover:shadow-lg'
-                }`}
-                onClick={() => setActiveFeature(feature.id)}
-              >
-                <CardContent className="pt-4 text-center">
-                  <feature.icon className={`w-8 h-8 mx-auto mb-3 ${feature.color}`} />
-                  <h3 className="font-semibold mb-2 flex items-center justify-center gap-2">
-                    {feature.title}
-                    <Badge variant="secondary" className="text-xs">
-                      {feature.badge}
-                    </Badge>
-                  </h3>
-                  <p className="text-sm text-gray-600">{feature.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-6">
-        {activeFeature === 'analyzer' && <IntelligentDocumentAnalyzer />}
-        {activeFeature === 'recommendations' && <AIRecommendationEngine />}
-        {activeFeature === 'assistant' && <ContextualSearchAssistant />}
+      <div className="text-center">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-2">
+          <Bot className="w-8 h-8 text-blue-600" />
+          Fonctionnalités IA Avancées
+        </h2>
+        <p className="text-gray-600 text-lg">
+          Utilisez l'intelligence artificielle pour analyser et résumer vos documents juridiques
+        </p>
       </div>
+
+      <Tabs defaultValue="analysis" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="analysis" className="flex items-center gap-2">
+            <Wand2 className="w-4 h-4" />
+            Analyse Intelligente
+          </TabsTrigger>
+          <TabsTrigger value="summary" className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Résumé Automatique
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analysis" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wand2 className="w-5 h-5" />
+                Analyse Intelligente de Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="analysis-type">Type d'analyse</Label>
+                <Select value={analysisType} onValueChange={setAnalysisType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner le type d'analyse" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {analysisTypes.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="analysis-input">Contenu à analyser</Label>
+                <EnhancedTextarea
+                  id="analysis-input"
+                  value={analysisInput}
+                  onChange={(e) => setAnalysisInput(e.target.value)}
+                  placeholder="Collez ici le texte juridique ou le document à analyser..."
+                  context="legal"
+                  enableVoice={true}
+                  className="min-h-[200px]"
+                />
+              </div>
+
+              <Button 
+                onClick={handleAnalysis}
+                disabled={loading || !analysisInput.trim() || !analysisType}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-2 animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Lancer l'analyse
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="summary" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Résumé Automatique de Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="summary-type">Type de résumé</Label>
+                <Select value={summaryType} onValueChange={setSummaryType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner le type de résumé" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {summaryTypes.map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="summary-input">Document à résumer</Label>
+                <EnhancedTextarea
+                  id="summary-input"
+                  value={summaryInput}
+                  onChange={(e) => setSummaryInput(e.target.value)}
+                  placeholder="Collez ici le document long à résumer automatiquement..."
+                  context="general"
+                  enableVoice={true}
+                  className="min-h-[200px]"
+                />
+              </div>
+
+              <Button 
+                onClick={handleSummary}
+                disabled={loading || !summaryInput.trim() || !summaryType}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-2 animate-spin" />
+                    Génération en cours...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="w-4 h-4 mr-2" />
+                    Générer le résumé
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Résultats */}
+      {results && (
+        <Card className="border-2 border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-blue-600" />
+              Résultats de l'analyse IA
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Badge className="mb-2">
+                {results.type === 'analysis' ? 'Analyse' : 'Résumé'}
+              </Badge>
+              <p className="text-gray-700">{results.content}</p>
+            </div>
+
+            {results.recommendations && (
+              <div>
+                <h4 className="font-semibold mb-2">Recommandations :</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  {results.recommendations.map((rec: string, index: number) => (
+                    <li key={index} className="text-sm text-gray-600">{rec}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {results.keyPoints && (
+              <div>
+                <h4 className="font-semibold mb-2">Points clés :</h4>
+                <ul className="list-disc list-inside space-y-1">
+                  {results.keyPoints.map((point: string, index: number) => (
+                    <li key={index} className="text-sm text-gray-600">{point}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

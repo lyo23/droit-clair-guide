@@ -1,62 +1,101 @@
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Filter } from 'lucide-react';
-import { format } from 'date-fns';
-import { VoiceSearchInput } from '@/components/common/VoiceSearchInput';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Filter, Search, X, RotateCcw } from 'lucide-react';
 
 interface FilterModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onApplyFilters: (filters: any) => void;
-  filterType: 'legal' | 'procedure' | 'general';
+  trigger?: React.ReactNode;
+  onFiltersApply?: (filters: any) => void;
+  initialFilters?: any;
 }
 
-export function FilterModal({ isOpen, onClose, onApplyFilters, filterType }: FilterModalProps) {
+export function FilterModal({ trigger, onFiltersApply, initialFilters = {} }: FilterModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState({
+    searchTerm: '',
     category: '',
     status: '',
-    dateFrom: undefined as Date | undefined,
-    dateTo: undefined as Date | undefined,
-    institution: '',
-    type: '',
-    keywords: '',
-    showOnlyFavorites: false
+    dateRange: '',
+    tags: [],
+    ...initialFilters
   });
 
-  const handleApply = () => {
-    onApplyFilters(filters);
-    onClose();
+  const categories = [
+    { value: 'legal', label: 'Textes juridiques' },
+    { value: 'procedure', label: 'Procédures' },
+    { value: 'forms', label: 'Formulaires' },
+    { value: 'templates', label: 'Modèles' }
+  ];
+
+  const statuses = [
+    { value: 'active', label: 'Actif' },
+    { value: 'inactive', label: 'Inactif' },
+    { value: 'pending', label: 'En attente' },
+    { value: 'archived', label: 'Archivé' }
+  ];
+
+  const availableTags = [
+    'Urgent', 'Important', 'Brouillon', 'Validé', 'En cours', 'Terminé'
+  ];
+
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleReset = () => {
+  const handleTagToggle = (tag: string) => {
+    setFilters(prev => ({
+      ...prev,
+      tags: prev.tags.includes(tag) 
+        ? prev.tags.filter(t => t !== tag)
+        : [...prev.tags, tag]
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    onFiltersApply?.(filters);
+    setIsOpen(false);
+  };
+
+  const handleResetFilters = () => {
     setFilters({
+      searchTerm: '',
       category: '',
       status: '',
-      dateFrom: undefined,
-      dateTo: undefined,
-      institution: '',
-      type: '',
-      keywords: '',
-      showOnlyFavorites: false
+      dateRange: '',
+      tags: []
     });
   };
 
-  const categories = filterType === 'legal' 
-    ? ['Civil', 'Administratif', 'Commercial', 'Pénal', 'Constitutionnel']
-    : ['État civil', 'Commerce', 'Transport', 'Éducation', 'Santé'];
-
-  const statuses = ['Publié', 'En révision', 'Archivé', 'Projet'];
+  const getActiveFiltersCount = () => {
+    return Object.values(filters).filter(value => {
+      if (Array.isArray(value)) return value.length > 0;
+      return value && value !== '';
+    }).length;
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="outline" className="gap-2">
+            <Filter className="w-4 h-4" />
+            Filtres
+            {getActiveFiltersCount() > 0 && (
+              <Badge variant="secondary" className="ml-1">
+                {getActiveFiltersCount()}
+              </Badge>
+            )}
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Filter className="w-5 h-5" />
@@ -64,109 +103,118 @@ export function FilterModal({ isOpen, onClose, onApplyFilters, filterType }: Fil
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-2 gap-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="category">Catégorie</Label>
-            <Select value={filters.category} onValueChange={(value) => setFilters({...filters, category: value})}>
+        <div className="space-y-6">
+          {/* Terme de recherche */}
+          <div>
+            <Label htmlFor="search-term">Terme de recherche</Label>
+            <EnhancedInput
+              id="search-term"
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+              placeholder="Rechercher dans le contenu..."
+              context="search"
+              enableVoice={true}
+            />
+          </div>
+
+          {/* Catégorie */}
+          <div>
+            <Label>Catégorie</Label>
+            <Select value={filters.category} onValueChange={(value) => handleFilterChange('category', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Toutes les catégories" />
+                <SelectValue placeholder="Sélectionner une catégorie" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">Toutes les catégories</SelectItem>
                 {categories.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="status">Statut</Label>
-            <Select value={filters.status} onValueChange={(value) => setFilters({...filters, status: value})}>
+          {/* Statut */}
+          <div>
+            <Label>Statut</Label>
+            <Select value={filters.status} onValueChange={(value) => handleFilterChange('status', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Tous les statuts" />
+                <SelectValue placeholder="Sélectionner un statut" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">Tous les statuts</SelectItem>
                 {statuses.map(status => (
-                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                  <SelectItem key={status.value} value={status.value}>
+                    {status.label}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Date de début</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filters.dateFrom ? format(filters.dateFrom, "dd/MM/yyyy") : "Sélectionner"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={filters.dateFrom}
-                  onSelect={(date) => setFilters({...filters, dateFrom: date})}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Date de fin</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {filters.dateTo ? format(filters.dateTo, "dd/MM/yyyy") : "Sélectionner"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={filters.dateTo}
-                  onSelect={(date) => setFilters({...filters, dateTo: date})}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="col-span-2 space-y-2">
-            <Label htmlFor="keywords">Mots-clés</Label>
-            <VoiceSearchInput
-              value={filters.keywords}
-              onChange={(value) => setFilters({...filters, keywords: value})}
-              placeholder="Rechercher des mots-clés..."
-              context="search"
+          {/* Période */}
+          <div>
+            <Label htmlFor="date-range">Période</Label>
+            <EnhancedInput
+              id="date-range"
+              value={filters.dateRange}
+              onChange={(e) => handleFilterChange('dateRange', e.target.value)}
+              placeholder="Ex: Derniers 30 jours, 2024..."
+              context="general"
+              enableVoice={true}
             />
           </div>
 
-          <div className="col-span-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="favorites"
-                checked={filters.showOnlyFavorites}
-                onCheckedChange={(checked) => setFilters({...filters, showOnlyFavorites: !!checked})}
-              />
-              <Label htmlFor="favorites">Afficher uniquement mes favoris</Label>
+          {/* Tags */}
+          <div>
+            <Label>Étiquettes</Label>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              {availableTags.map(tag => (
+                <div key={tag} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={`tag-${tag}`}
+                    checked={filters.tags.includes(tag)}
+                    onCheckedChange={() => handleTagToggle(tag)}
+                  />
+                  <Label htmlFor={`tag-${tag}`} className="text-sm">
+                    {tag}
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
 
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={handleReset}>
-            Réinitialiser
-          </Button>
-          <div className="space-x-2">
-            <Button variant="outline" onClick={onClose}>
-              Annuler
-            </Button>
-            <Button onClick={handleApply}>
+          {/* Filtres actifs */}
+          {getActiveFiltersCount() > 0 && (
+            <div>
+              <Label>Filtres actifs</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {Object.entries(filters).map(([key, value]) => {
+                  if (!value || (Array.isArray(value) && value.length === 0)) return null;
+                  return (
+                    <Badge key={key} variant="secondary" className="flex items-center gap-1">
+                      {key}: {Array.isArray(value) ? value.join(', ') : value}
+                      <X
+                        className="w-3 h-3 cursor-pointer"
+                        onClick={() => handleFilterChange(key, Array.isArray(value) ? [] : '')}
+                      />
+                    </Badge>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-4 border-t">
+            <Button onClick={handleApplyFilters} className="flex-1">
+              <Search className="w-4 h-4 mr-2" />
               Appliquer les filtres
+            </Button>
+            <Button variant="outline" onClick={handleResetFilters}>
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Réinitialiser
             </Button>
           </div>
         </div>

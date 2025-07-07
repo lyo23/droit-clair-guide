@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { EnhancedInput } from '@/components/common/EnhancedInput';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -95,11 +95,13 @@ export function AdvancedSearchFilters({ onSearch, onReset }: AdvancedSearchFilte
         {/* Requête principale */}
         <div>
           <Label htmlFor="search-query">Recherche</Label>
-          <Input
+          <EnhancedInput
             id="search-query"
             value={filters.query}
             onChange={(e) => handleFilterChange('query', e.target.value)}
             placeholder="Mots-clés, termes juridiques..."
+            context="search"
+            enableVoice={true}
           />
         </div>
 
