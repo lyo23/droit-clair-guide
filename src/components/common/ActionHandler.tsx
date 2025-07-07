@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useModals } from '@/hooks/useModals';
 import { PDFViewerModal } from '@/components/modals/PDFViewerModal';
@@ -11,6 +12,7 @@ import { AnalysisModal } from '@/components/modals/AnalysisModal';
 import { ManagementModal } from '@/components/modals/ManagementModal';
 import { WorkflowModal } from '@/components/modals/WorkflowModal';
 import { NotificationModal } from '@/components/modals/NotificationModal';
+import { GeolocationSearchModal } from '@/components/modals/GeolocationSearchModal';
 import { useToast } from '@/hooks/use-toast';
 
 interface ActionHandlerProps {
@@ -375,7 +377,8 @@ export function ActionHandler({ children }: ActionHandlerProps) {
       />
 
       <FilterModal
-        trigger={null}
+        isOpen={modals.filter.isOpen}
+        onClose={() => closeModal('filter')}
         filterType={modals.filter.type}
         onFiltersApply={(filters) => {
           console.log('Filters applied:', filters);
@@ -383,6 +386,7 @@ export function ActionHandler({ children }: ActionHandlerProps) {
             title: "Filtres appliqués",
             description: "Vos filtres ont été appliqués avec succès.",
           });
+          closeModal('filter');
         }}
       />
 
@@ -469,6 +473,15 @@ export function ActionHandler({ children }: ActionHandlerProps) {
             title: "Notification envoyée",
             description: "La notification a été envoyée avec succès.",
           });
+        }}
+      />
+
+      <GeolocationSearchModal
+        isOpen={modals.geolocationSearch.isOpen}
+        onClose={() => closeModal('geolocationSearch')}
+        onLocationSelect={(location) => {
+          console.log('Location selected:', location);
+          closeModal('geolocationSearch');
         }}
       />
     </>
